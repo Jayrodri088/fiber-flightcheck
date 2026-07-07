@@ -1,6 +1,6 @@
 # Fiber Flightcheck Demo Runbook
 
-Use this runbook when preparing the hosted judging demo.
+Use this runbook when preparing the live judging demo.
 
 ## Target Setup
 
@@ -30,7 +30,7 @@ For local developer testing only, set `ALLOW_CLIENT_RPC=true` to allow the UI to
 2. Confirm the FNN RPC is reachable locally.
 3. Build and start Fiber Flightcheck.
 4. Open the public app URL.
-5. Run the hosted demo node check.
+5. Run the live Fiber node check.
 
 ## Local Health Check
 
@@ -64,7 +64,7 @@ npm run app
 ## Demo Script
 
 1. Open the Flightcheck URL.
-2. Keep the endpoint mode on `Hosted demo node`.
+2. Keep the endpoint mode on `Live node`.
 3. Set amount to `10` and asset to `CKB`.
 4. Click `Run Flightcheck`.
 5. Show the readiness decision, funding panel, channel lifecycle, and demo flow.

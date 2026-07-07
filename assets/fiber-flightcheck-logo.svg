@@ -1,13 +1,14 @@
 <svg viewBox="0 0 64 64" role="img" aria-label="Fiber Flightcheck logo" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="flightcheck-mark" x1="8" y1="8" x2="56" y2="56">
-      <stop stop-color="#5df2a6"/>
-      <stop offset="0.52" stop-color="#47d9ff"/>
-      <stop offset="1" stop-color="#7aa2ff"/>
+    <linearGradient id="flightcheck-mark" x1="12" y1="16" x2="52" y2="48">
+      <stop stop-color="#f8fafc"/>
+      <stop offset="0.55" stop-color="#9fffc7"/>
+      <stop offset="1" stop-color="#31e981"/>
     </linearGradient>
   </defs>
-  <rect x="6" y="6" width="52" height="52" rx="16" fill="#07111d" stroke="#1f3b45"/>
-  <path d="M19 43V20h27M19 32h20M19 43h28" fill="none" stroke="url(#flightcheck-mark)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="47" cy="20" r="4" fill="#5df2a6"/>
-  <circle cx="47" cy="43" r="4" fill="#47d9ff"/>
+  <rect x="5" y="5" width="54" height="54" rx="18" fill="#050505" stroke="#2b2f2c"/>
+  <path d="M16 22h22c6 0 10 4 10 10s-4 10-10 10H16" fill="none" stroke="url(#flightcheck-mark)" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 32h18" fill="none" stroke="#f8fafc" stroke-width="4.6" stroke-linecap="round"/>
+  <path d="M16 42h18" fill="none" stroke="#31e981" stroke-width="4.6" stroke-linecap="round"/>
+  <circle cx="48" cy="32" r="4.5" fill="#31e981"/>
 </svg>

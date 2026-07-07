@@ -4,39 +4,39 @@ export function ConnectionCard({
   rpcUrl,
   amount,
   asset,
-  hostedMode,
+  liveNodeMode,
   state,
   onRpcUrl,
   onAmount,
   onAsset,
-  onHostedMode,
+  onLiveNodeMode,
   onRun,
 }: {
   rpcUrl: string;
   amount: string;
   asset: string;
-  hostedMode: boolean;
+  liveNodeMode: boolean;
   state: RunState;
   onRpcUrl: (value: string) => void;
   onAmount: (value: string) => void;
   onAsset: (value: string) => void;
-  onHostedMode: (value: boolean) => void;
+  onLiveNodeMode: (value: boolean) => void;
   onRun: () => void;
 }) {
   return (
     <section className="control-card" aria-label="Live Fiber check controls">
       <div>
-        <span className="label">Live Endpoint</span>
+        <span className="label">Fiber Node</span>
         <h2>Run a payment readiness check</h2>
         <p>
-          Use the hosted FNN backend for the live demo, or switch to custom RPC when running
-          Flightcheck inside your own trusted operator environment.
+          Check whether the active Fiber node has the peers, channels, liquidity, and funding
+          needed to satisfy this payment request.
         </p>
         <div className="mode-toggle" aria-label="Endpoint mode">
-          <button className={hostedMode ? "active" : ""} onClick={() => onHostedMode(true)}>
-            Hosted demo node
+          <button className={liveNodeMode ? "active" : ""} onClick={() => onLiveNodeMode(true)}>
+            Live node
           </button>
-          <button className={!hostedMode ? "active" : ""} onClick={() => onHostedMode(false)}>
+          <button className={!liveNodeMode ? "active" : ""} onClick={() => onLiveNodeMode(false)}>
             Custom RPC
           </button>
         </div>
@@ -46,14 +46,14 @@ export function ConnectionCard({
         <label>
           Fiber RPC URL
           <input
-            value={hostedMode ? "Hosted FNN backend - private server RPC" : rpcUrl}
-            disabled={hostedMode}
+            value={liveNodeMode ? "Active Fiber node" : rpcUrl}
+            disabled={liveNodeMode}
             onChange={(event) => onRpcUrl(event.target.value)}
           />
           <small>
-            {hostedMode
-              ? "The app server checks its private FNN endpoint."
-              : "Custom RPC must be enabled on the app server."}
+            {liveNodeMode
+              ? "Using the configured Fiber node for this deployment."
+              : "Use only a local or trusted FNN JSON-RPC endpoint."}
           </small>
         </label>
         <label>

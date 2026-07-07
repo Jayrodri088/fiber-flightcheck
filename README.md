@@ -20,7 +20,7 @@ If not, why not, and what should be fixed?
 - CLI doctor command
 - `can-pay` readiness command
 - React dashboard
-- hosted demo node mode
+- live Fiber node mode
 - production-safe server RPC configuration
 - `/api/health` deployment check
 - proof script for core scenarios
@@ -40,8 +40,8 @@ FLIGHTCHECK_DEFAULT_AMOUNT=10
 FLIGHTCHECK_DEFAULT_ASSET=CKB
 ```
 
-`FIBER_RPC_URL` should point to a private FNN JSON-RPC endpoint available to the
-app server. Keep `ALLOW_CLIENT_RPC=false` for hosted demos so the public server
+`FIBER_RPC_URL` should point to the FNN JSON-RPC endpoint available to the
+app server. Keep `ALLOW_CLIENT_RPC=false` for public deployments so the server
 does not proxy arbitrary RPC URLs.
 
 ## Run
@@ -59,9 +59,8 @@ Then open:
 http://127.0.0.1:4173
 ```
 
-The app server serves the built UI and proxies `/api/check` requests to the
-server-configured Fiber RPC endpoint. In hosted mode, the browser does not need
-to know the private FNN RPC URL.
+The app server serves the built UI and runs `/api/check` requests against the
+server-configured Fiber node. The browser does not need direct access to FNN RPC.
 
 Health check:
 
