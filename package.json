@@ -1,0 +1,37 @@
+{
+  "name": "fiber-flightcheck",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Preflight diagnostics and payment readiness toolkit for Fiber Network developers.",
+  "scripts": {
+    "start": "parcel index.html --no-cache",
+    "app": "npm run build && tsx ./scripts/app-server.ts",
+    "app:alt": "npm run build && set PORT=4174&& tsx ./scripts/app-server.ts",
+    "serve": "tsx ./scripts/app-server.ts",
+    "build": "parcel build index.html --dist-dir dist --public-url ./",
+    "lint": "tsc --noEmit",
+    "proof": "tsx ./scripts/proof.ts",
+    "doctor:mock": "tsx ./scripts/doctor.ts --mock healthy",
+    "can-pay:mock": "tsx ./scripts/can-pay.ts --mock healthy --amount 10 --asset CKB",
+    "report:mock": "tsx ./scripts/report.ts --mock healthy --amount 10 --asset CKB --out flightcheck-report",
+    "smoke:mock": "tsx ./scripts/smoke.ts --payer-mock healthy --receiver-mock healthy --amount 1 --asset CKB",
+    "doctor": "tsx ./scripts/doctor.ts",
+    "can-pay": "tsx ./scripts/can-pay.ts",
+    "report": "tsx ./scripts/report.ts",
+    "smoke": "tsx ./scripts/smoke.ts",
+    "run:all": "npm run lint && npm run proof && npm run report:mock && npm run smoke:mock && npm run build"
+  },
+  "dependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.9",
+    "parcel": "^2.15.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.3"
+  }
+}
