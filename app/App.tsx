@@ -9,6 +9,7 @@ import { LiveReport } from "./components/LiveReport";
 import { OperatorGuidance } from "./components/OperatorGuidance";
 import { ReportActions } from "./components/ReportActions";
 import { ScenarioLab } from "./components/ScenarioLab";
+import { UserPath } from "./components/UserPath";
 import type { RunState } from "./types";
 import { formatTime } from "./utils";
 
@@ -95,7 +96,8 @@ export function App() {
           <h1>Know if your Fiber node can pay before your app tries.</h1>
           <p>
             Flightcheck inspects FNN reachability, channel lifecycle, CKB liquidity, peers, and
-            asset support, then returns the exact go/no-go signal a production app needs.
+            asset support, then returns the exact go/no-go signal a production app needs. To check
+            your own node, run Flightcheck beside your FNN and keep RPC access private.
           </p>
           <div className="hero-pills" aria-label="Core checks">
             <span>Fiber nodes</span>
@@ -113,6 +115,8 @@ export function App() {
           <strong>READY_FOR_PAYMENT</strong>
         </aside>
       </section>
+
+      <UserPath />
 
       <section id="live" className="workspace">
         <ConnectionCard
