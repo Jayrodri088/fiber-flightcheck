@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { reportToJson } from "../lib/report";
 import type { FlightcheckReport } from "../lib/types";
+import { BrandMark } from "./components/BrandMark";
 import { ConnectionCard } from "./components/ConnectionCard";
 import { DemoFlow } from "./components/DemoFlow";
 import { FundingPanel } from "./components/FundingPanel";
@@ -20,6 +21,7 @@ export function App() {
   const [state, setState] = useState<RunState>("idle");
   const [error, setError] = useState("");
   const [lastChecked, setLastChecked] = useState<string>();
+  const initialHostedCheck = useRef(false);
 
   useEffect(() => {
     localStorage.setItem("fiber.rpcUrl", rpcUrl);
@@ -49,12 +51,30 @@ export function App() {
     }
   }, [rpcUrl, amount, asset, hostedMode]);
 
+  useEffect(() => {
+    if (initialHostedCheck.current || !hostedMode) return;
+    initialHostedCheck.current = true;
+    void runCheck();
+  }, [hostedMode, runCheck]);
+
+  const liveStatus =
+    state === "checking"
+      ? "Checking hosted node"
+      : report?.readiness.ready
+        ? "Payment-ready"
+        : report
+          ? "Action needed"
+          : "Hosted demo";
+
   return (
     <main>
       <header>
         <a className="brand" href="#">
-          <i aria-hidden="true" />
-          <span>Fiber Flightcheck</span>
+          <BrandMark className="brand-mark" />
+          <span>
+            Fiber Flightcheck
+            <small>Payment readiness console</small>
+          </span>
         </a>
         <nav aria-label="Product sections">
           <a href="#live">Live Check</a>
@@ -63,26 +83,31 @@ export function App() {
           <a href="#flow">Flow</a>
           <a href="#lab">Scenario Lab</a>
         </nav>
+        <span className={`live-chip ${report?.readiness.ready ? "ready" : ""}`}>
+          <i aria-hidden="true" />
+          {liveStatus}
+        </span>
       </header>
 
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">Fiber operator console</p>
-          <h1>Preflight checks for payment-channel infrastructure.</h1>
+          <p className="eyebrow">Hosted Fiber operator console</p>
+          <h1>Know if your Fiber node can pay before your app tries.</h1>
           <p>
-            Flightcheck connects to FNN, inspects peers, channels, liquidity, funding, and asset
-            support, then turns raw node state into a decision an app can trust.
+            Flightcheck inspects a live FNN backend, channel lifecycle, liquidity, funding, peers,
+            and asset support, then returns the exact go/no-go signal a production app needs.
           </p>
           <div className="hero-pills" aria-label="Core checks">
+            <span>Hosted demo node</span>
             <span>RPC reachability</span>
-            <span>Channel state</span>
-            <span>Liquidity bounds</span>
-            <span>Funding readiness</span>
+            <span>ChannelReady</span>
+            <span>CKB liquidity</span>
+            <span>Report export</span>
           </div>
         </div>
         <aside className="hero-terminal" aria-label="Readiness flow preview">
           <span className="terminal-title">flightcheck/run</span>
-          <code>connect fnn://127.0.0.1:8227</code>
+          <code>connect hosted-fnn://private-rpc</code>
           <code>inspect peers channels funding</code>
           <code>assert amount=10 asset=CKB</code>
           <strong>READY_FOR_PAYMENT</strong>

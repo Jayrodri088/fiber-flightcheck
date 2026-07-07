@@ -29,8 +29,8 @@ export function ConnectionCard({
         <span className="label">Live Endpoint</span>
         <h2>Run a payment readiness check</h2>
         <p>
-          Connect to a running FNN JSON-RPC endpoint, choose the payment profile, and get a
-          pass/fail result with the exact operational blocker.
+          Use the hosted FNN backend for the live demo, or switch to custom RPC when running
+          Flightcheck inside your own trusted operator environment.
         </p>
         <div className="mode-toggle" aria-label="Endpoint mode">
           <button className={hostedMode ? "active" : ""} onClick={() => onHostedMode(true)}>
@@ -46,7 +46,7 @@ export function ConnectionCard({
         <label>
           Fiber RPC URL
           <input
-            value={hostedMode ? "Server configured Fiber node" : rpcUrl}
+            value={hostedMode ? "Hosted FNN backend - private server RPC" : rpcUrl}
             disabled={hostedMode}
             onChange={(event) => onRpcUrl(event.target.value)}
           />

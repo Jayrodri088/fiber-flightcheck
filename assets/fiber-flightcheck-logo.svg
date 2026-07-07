@@ -1,0 +1,13 @@
+<svg viewBox="0 0 64 64" role="img" aria-label="Fiber Flightcheck logo" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flightcheck-mark" x1="8" y1="8" x2="56" y2="56">
+      <stop stop-color="#5df2a6"/>
+      <stop offset="0.52" stop-color="#47d9ff"/>
+      <stop offset="1" stop-color="#7aa2ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="52" height="52" rx="16" fill="#07111d" stroke="#1f3b45"/>
+  <path d="M19 43V20h27M19 32h20M19 43h28" fill="none" stroke="url(#flightcheck-mark)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="47" cy="20" r="4" fill="#5df2a6"/>
+  <circle cx="47" cy="43" r="4" fill="#47d9ff"/>
+</svg>
