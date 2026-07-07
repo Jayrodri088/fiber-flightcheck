@@ -1,4 +1,5 @@
 import type { FlightcheckReport } from "../lib/types";
+import { displayFiberSource } from "../app/utils";
 
 export function NodePanel({ report }: { report: FlightcheckReport }) {
   const { snapshot } = report;
@@ -7,7 +8,7 @@ export function NodePanel({ report }: { report: FlightcheckReport }) {
       <span className="label">Node</span>
       <h2>{snapshot.node?.alias ?? "No node info"}</h2>
       <dl>
-        <div><dt>Source</dt><dd>{snapshot.source}</dd></div>
+        <div><dt>Connection</dt><dd>{displayFiberSource(snapshot.source)}</dd></div>
         <div><dt>Network</dt><dd>{snapshot.node?.network ?? "-"}</dd></div>
         <div><dt>Chain hash</dt><dd>{snapshot.node?.chainHash ?? "-"}</dd></div>
         <div><dt>Version</dt><dd>{snapshot.node?.version ?? "-"}</dd></div>

@@ -4,7 +4,7 @@ import { MetricsGrid } from "../../components/MetricsGrid";
 import { NodePanel, ReadinessPanel } from "../../components/ReadinessPanels";
 import { StatusHero } from "../../components/StatusHero";
 import type { FlightcheckReport } from "../../lib/types";
-import { formatTime } from "../utils";
+import { displayFiberSource, formatTime } from "../utils";
 
 export function LiveReport({ report, lastChecked }: { report?: FlightcheckReport; lastChecked?: string }) {
   if (!report) {
@@ -24,8 +24,8 @@ export function LiveReport({ report, lastChecked }: { report?: FlightcheckReport
 
       <section className="meta-strip">
         <div>
-          <span>Endpoint</span>
-          <strong>{report.snapshot.source}</strong>
+          <span>Fiber Node</span>
+          <strong>{displayFiberSource(report.snapshot.source)}</strong>
         </div>
         <div>
           <span>Last Checked</span>
