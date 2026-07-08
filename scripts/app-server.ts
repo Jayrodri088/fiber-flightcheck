@@ -1,28 +1,85 @@
 import { createServer } from "node:http";
 import type { IncomingMessage } from "node:http";
+import { execFile } from "node:child_process";
 import { extname, join, normalize, resolve } from "node:path";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { promisify } from "node:util";
 import { fetchFiberSnapshot } from "../lib/fiber-rpc";
 import { buildReport } from "../lib/readiness";
 import { reportToMarkdown } from "../lib/report";
 
 const root = resolve("dist");
 const port = Number(process.env.PORT ?? 4173);
+const execFileAsync = promisify(execFile);
 const configuredRpcUrl = process.env.FIBER_RPC_URL?.trim() || "http://127.0.0.1:8227";
 const allowClientRpc = process.env.ALLOW_CLIENT_RPC === "true";
 const defaultAmount = Number(process.env.FLIGHTCHECK_DEFAULT_AMOUNT ?? 10);
 const defaultAsset = (process.env.FLIGHTCHECK_DEFAULT_ASSET ?? "CKB").trim().toUpperCase();
+const fnnCliPath = process.env.FNN_CLI_PATH?.trim() || "fnn-cli";
+const paymentProofTarget = process.env.PAYMENT_PROOF_TARGET_PUBKEY?.trim() || "";
+const paymentProofEnabled = process.env.PAYMENT_PROOF_ENABLED === "true";
+const paymentExecutionEnabled = process.env.PAYMENT_EXECUTION_ENABLED === "true";
+const paymentExecutionToken = process.env.PAYMENT_EXECUTION_TOKEN?.trim() || "";
+const paymentProofMaxCkb = Number(process.env.PAYMENT_PROOF_MAX_CKB ?? 1);
+const paymentProofCooldownMs = Number(process.env.PAYMENT_PROOF_COOLDOWN_MS ?? 60_000);
+let lastPaymentProofAt = 0;
 
 type CheckBody = {
   rpcUrl?: string;
   amount?: number;
   asset?: string;
+  execute?: boolean;
+  executionToken?: string;
 };
 
 function selectedRpcUrl(body?: CheckBody) {
   if (allowClientRpc && body?.rpcUrl?.trim()) return body.rpcUrl.trim();
   return configuredRpcUrl;
+}
+
+function ckbToShannons(amount: number) {
+  return Math.round(amount * 100_000_000);
+}
+
+function redactHash(value?: string) {
+  if (!value || value.length <= 18) return value ?? "";
+  return `${value.slice(0, 10)}...${value.slice(-8)}`;
+}
+
+async function runFnnPayment({
+  amount,
+  dryRun,
+}: {
+  amount: number;
+  dryRun: boolean;
+}) {
+  const args = [
+    "payment",
+    "send_payment",
+    "--url",
+    configuredRpcUrl,
+    "--target-pubkey",
+    paymentProofTarget,
+    "--amount",
+    String(ckbToShannons(amount)),
+    "--keysend",
+    "true",
+    "--dry-run",
+    String(dryRun),
+    "--timeout",
+    "15",
+    "--output-format",
+    "json",
+    "--no-banner",
+  ];
+  const { stdout } = await execFileAsync(fnnCliPath, args, { timeout: 30_000 });
+  return JSON.parse(stdout) as {
+    payment_hash?: string;
+    status?: string;
+    fee?: string;
+    failed_error?: string | null;
+  };
 }
 
 const contentTypes: Record<string, string> = {
@@ -85,6 +142,122 @@ async function handleHealth() {
   });
 }
 
+async function handlePaymentProof(request: IncomingMessage) {
+  const body = await readJsonBody(request);
+  const amount = Number(body.amount ?? defaultAmount);
+  const asset = (body.asset?.trim() || defaultAsset).toUpperCase();
+  const execute = body.execute === true;
+
+  if (!paymentProofEnabled) {
+    return json(403, {
+      enabled: false,
+      message: "Payment proof is disabled on this deployment.",
+      nextAction: "Set PAYMENT_PROOF_ENABLED=true on a trusted operator deployment.",
+    });
+  }
+
+  if (!paymentProofTarget) {
+    return json(400, {
+      enabled: true,
+      message: "Payment proof target peer is not configured.",
+      nextAction: "Set PAYMENT_PROOF_TARGET_PUBKEY to a trusted Fiber peer.",
+    });
+  }
+
+  if (asset !== "CKB") {
+    return json(400, { error: "payment proof currently supports CKB only" });
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0 || amount > paymentProofMaxCkb) {
+    return json(400, { error: `amount must be between 0 and ${paymentProofMaxCkb} CKB` });
+  }
+
+  const now = Date.now();
+  if (now - lastPaymentProofAt < paymentProofCooldownMs) {
+    return json(429, {
+      error: "payment proof cooldown active",
+      retryAfterMs: paymentProofCooldownMs - (now - lastPaymentProofAt),
+    });
+  }
+
+  const snapshot = await fetchFiberSnapshot(configuredRpcUrl);
+  const report = buildReport(snapshot, { amount, asset });
+  if (!report.readiness.ready) {
+    return json(409, {
+      proofReady: false,
+      readiness: report.readiness,
+      nextAction: report.readiness.nextAction,
+    });
+  }
+
+  if (execute && (!paymentExecutionEnabled || !paymentExecutionToken)) {
+    return json(403, {
+      proofReady: true,
+      mode: "dry-run",
+      message: "Live execution is disabled on this deployment.",
+      nextAction: "Enable PAYMENT_EXECUTION_ENABLED and set PAYMENT_EXECUTION_TOKEN only during a trusted judging or operator window.",
+    });
+  }
+
+  if (execute && body.executionToken !== paymentExecutionToken) {
+    return json(403, {
+      proofReady: true,
+      mode: "dry-run",
+      message: "Live execution token was missing or invalid.",
+      nextAction: "Run the dry-run proof publicly, or use the operator token only in a trusted session.",
+    });
+  }
+
+  let dryRunResult: Awaited<ReturnType<typeof runFnnPayment>>;
+  let executionResult: Awaited<ReturnType<typeof runFnnPayment>> | undefined;
+  const liveExecution = execute && paymentExecutionEnabled;
+  try {
+    dryRunResult = await runFnnPayment({ amount, dryRun: true });
+    executionResult = liveExecution ? await runFnnPayment({ amount, dryRun: false }) : undefined;
+  } catch {
+    return json(502, {
+      proofReady: false,
+      message: "Payment proof command failed.",
+      nextAction: "Confirm fnn-cli is installed, the target peer is connected, and the configured channel has enough send liquidity.",
+    });
+  }
+  lastPaymentProofAt = Date.now();
+
+  return json(200, {
+    proofReady: true,
+    mode: liveExecution ? "executed" : "dry-run",
+    amount,
+    asset,
+    target: "configured Fiber peer",
+    security: {
+      serverConfiguredRpcOnly: true,
+      clientRpcAllowed: allowClientRpc,
+      maxCkb: paymentProofMaxCkb,
+      liveExecutionEnabled: paymentExecutionEnabled,
+      liveExecutionRequiresToken: true,
+      rawPeerHidden: true,
+    },
+    dryRun: {
+      status: dryRunResult.status ?? "unknown",
+      paymentHash: redactHash(dryRunResult.payment_hash),
+      fee: dryRunResult.fee,
+      failedError: dryRunResult.failed_error ?? undefined,
+    },
+    execution: executionResult
+      ? {
+          status: executionResult.status ?? "unknown",
+          paymentHash: redactHash(executionResult.payment_hash),
+          fee: executionResult.fee,
+          failedError: executionResult.failed_error ?? undefined,
+        }
+      : undefined,
+    nextAction: liveExecution
+      ? "Live payment proof submitted through Fiber."
+      : "Dry-run route/payment proof succeeded. Live execution is operator-gated.",
+    generatedAt: new Date().toISOString(),
+  });
+}
+
 async function handleMarkdownReport(request: IncomingMessage) {
   const check = await handleCheck(request);
   if (check.status !== 200) return check;
@@ -115,6 +288,8 @@ const server = createServer(async (request, response) => {
     const result =
       route === "POST /api/check"
         ? await handleCheck(request)
+        : route === "POST /api/payment-proof"
+          ? await handlePaymentProof(request)
         : route === "POST /api/report.md"
           ? await handleMarkdownReport(request)
           : route === "GET /api/health"

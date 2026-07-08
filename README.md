@@ -26,6 +26,8 @@ If not, why not, and what should be fixed?
 - proof script for core scenarios
 - report export
 - two-node smoke readiness checks
+- bounded payment proof dry-run with redacted output
+- operator-gated live payment execution path
 
 ## Configuration
 
@@ -38,11 +40,35 @@ FIBER_RPC_URL=http://127.0.0.1:8227
 ALLOW_CLIENT_RPC=false
 FLIGHTCHECK_DEFAULT_AMOUNT=10
 FLIGHTCHECK_DEFAULT_ASSET=CKB
+FNN_CLI_PATH=fnn-cli
+PAYMENT_PROOF_ENABLED=false
+PAYMENT_PROOF_TARGET_PUBKEY=
+PAYMENT_PROOF_MAX_CKB=1
+PAYMENT_PROOF_COOLDOWN_MS=60000
+PAYMENT_EXECUTION_ENABLED=false
+PAYMENT_EXECUTION_TOKEN=
 ```
 
 `FIBER_RPC_URL` should point to the FNN JSON-RPC endpoint available to the
 app server. Keep `ALLOW_CLIENT_RPC=false` for public deployments so the server
 does not proxy arbitrary RPC URLs.
+
+Set `PAYMENT_PROOF_ENABLED=true` only on a trusted operator deployment with
+`FNN_CLI_PATH` and `PAYMENT_PROOF_TARGET_PUBKEY` configured. The public proof
+flow runs a bounded dry-run keysend against the configured peer and redacts the
+payment hash. Keep `PAYMENT_EXECUTION_ENABLED=false` for public demos unless you
+are inside a short trusted judging window; live execution additionally requires
+`PAYMENT_EXECUTION_TOKEN`.
+
+## Security Posture
+
+- FNN JSON-RPC should stay private to the app server.
+- Browser users should not be able to submit arbitrary RPC URLs in public mode.
+- Payment proof target peers are operator-configured, not user supplied.
+- Public proof output hides the raw peer target and redacts payment hashes.
+- Live payment execution is disabled by default and token-gated when enabled.
+- Use tiny payment caps and cooldowns for testnet demos; review this before any
+  mainnet deployment.
 
 ## Run
 

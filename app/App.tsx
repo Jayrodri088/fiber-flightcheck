@@ -7,6 +7,7 @@ import { DemoFlow } from "./components/DemoFlow";
 import { FundingPanel } from "./components/FundingPanel";
 import { LiveReport } from "./components/LiveReport";
 import { OperatorGuidance } from "./components/OperatorGuidance";
+import { PaymentProof } from "./components/PaymentProof";
 import { ReportActions } from "./components/ReportActions";
 import { ScenarioLab } from "./components/ScenarioLab";
 import { UserPath } from "./components/UserPath";
@@ -80,6 +81,7 @@ export function App() {
         <nav aria-label="Product sections">
           <a href="#live">Live Check</a>
           <a href="#funding">Funding</a>
+          <a href="#proof">Proof</a>
           <a href="#channels">Channels</a>
           <a href="#flow">Flow</a>
           <a href="#lab">Scenario Lab</a>
@@ -140,6 +142,9 @@ export function App() {
       </section>
 
       <LiveReport report={report} lastChecked={lastChecked} />
+      <section id="proof">
+        <PaymentProof report={report} amount={amount} asset={asset} />
+      </section>
       <section id="funding" className="grid">
         <FundingPanel report={report} />
         <div id="flow">

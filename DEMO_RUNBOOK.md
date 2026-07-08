@@ -20,9 +20,18 @@ export FIBER_RPC_URL=http://127.0.0.1:8227
 export ALLOW_CLIENT_RPC=false
 export FLIGHTCHECK_DEFAULT_AMOUNT=10
 export FLIGHTCHECK_DEFAULT_ASSET=CKB
+export FNN_CLI_PATH=/home/ubuntu/fiber-bin/fnn-cli
+export PAYMENT_PROOF_ENABLED=true
+export PAYMENT_PROOF_TARGET_PUBKEY=<trusted-peer-pubkey>
+export PAYMENT_PROOF_MAX_CKB=0.05
+export PAYMENT_PROOF_COOLDOWN_MS=60000
+export PAYMENT_EXECUTION_ENABLED=false
 ```
 
 For local developer testing only, set `ALLOW_CLIENT_RPC=true` to allow the UI to check a custom RPC URL.
+Keep `PAYMENT_EXECUTION_ENABLED=false` for public access. For a short trusted
+judging window, live execution may be enabled only with `PAYMENT_EXECUTION_TOKEN`
+set and a tiny `PAYMENT_PROOF_MAX_CKB`.
 
 ## Start Order
 
@@ -68,7 +77,24 @@ npm run app
 3. Set amount to `10` and asset to `CKB`.
 4. Click `Run Flightcheck`.
 5. Show the readiness decision, funding panel, channel lifecycle, and demo flow.
-6. Export the live report.
+6. Click `Run Payment Proof` to generate a bounded dry-run payment proof.
+7. Export the live report and payment proof.
+
+## Payment Proof Check
+
+```bash
+curl -s -X POST http://127.0.0.1:4173/api/payment-proof \
+  -H 'content-type: application/json' \
+  -d '{"amount":0.01,"asset":"CKB"}'
+```
+
+Expected safe public signals:
+
+- `proofReady: true`
+- `mode: dry-run`
+- `target: configured Fiber peer`
+- redacted `paymentHash`
+- `liveExecutionEnabled: false`
 
 ## Recovery
 
@@ -78,4 +104,6 @@ If the app is up but readiness fails:
 - Confirm FNN is running.
 - Confirm the configured channel is still `ChannelReady`.
 - Confirm the funding address still has testnet CKB.
+- Confirm `FNN_CLI_PATH` points to a working `fnn-cli`.
+- Confirm `PAYMENT_PROOF_TARGET_PUBKEY` is the peer connected to the payment channel.
 - Restart only the app server if the node is healthy but the UI/API is stale.
