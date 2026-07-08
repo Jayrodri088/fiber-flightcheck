@@ -591,6 +591,15 @@ dl { margin: 0; }
 dl div { display: flex; justify-content: space-between; gap: 18px; padding: 12px 0; border-top: 1px solid rgba(129,239,202,.12); }
 dt { color: var(--muted); }
 dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.panel-note {
+  margin: 16px 0 0;
+  padding: 14px;
+  border: 1px solid rgba(49, 233, 129, .18);
+  border-radius: 14px;
+  color: var(--soft);
+  background: rgba(49, 233, 129, .055);
+  font-size: 13px;
+}
 
 .channels, .issues {
   display: grid;
