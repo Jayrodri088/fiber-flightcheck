@@ -67,7 +67,7 @@ function TopBar({
 
       <span className={`live-chip ${ready ? "ready" : ""}`}>
         <i aria-hidden="true" />
-        {ready ? "Payment-ready" : "Live Fiber"}
+        {ready ? "Payment ready" : "Awaiting check"}
       </span>
     </header>
   );
@@ -79,8 +79,8 @@ function HomePage({ onStart, report }: { onStart: () => void; report?: Flightche
     <div className="page home-page">
       <section className="landing-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Fiber infrastructure</span>
-          <h1>A pre-payment gateway for Fiber apps.</h1>
+          <span className="eyebrow">Payment operations for Fiber</span>
+          <h1>Know a Fiber payment will work before you send it.</h1>
           <p>
             Flightcheck gives wallets, merchants, and operators a clear go/no-go signal before a
             Fiber payment attempt. It checks node health, channel state, liquidity, funding, and
@@ -88,37 +88,41 @@ function HomePage({ onStart, report }: { onStart: () => void; report?: Flightche
           </p>
           <div className="hero-actions">
             <button className="primary-action" onClick={onStart}>
-              Open Console
+              Run a flightcheck
             </button>
             <a className="secondary-action" href="https://github.com/Jayrodri088/fiber-flightcheck">
-              View Repo
+              Explore the source
             </a>
+          </div>
+          <div className="trust-row" aria-label="Product safeguards">
+            <span>Private RPC</span>
+            <span>Bounded proof</span>
+            <span>Operator-gated execution</span>
           </div>
         </div>
 
-        <aside className="product-card" aria-label="Product status preview">
-          <div className="status-line">
-            <span className={ready ? "dot ready" : "dot"} />
-            <strong>{ready ? "READY_FOR_PAYMENT" : "AWAITING_CHECK"}</strong>
+        <aside className={`product-card ${ready ? "is-ready" : ""}`} aria-label="Product status preview">
+          <div className="preview-head">
+            <div>
+              <span className="label">Latest decision</span>
+              <strong>{ready ? "Ready to pay" : "Run required"}</strong>
+            </div>
+            <span className={`decision-mark ${ready ? "ready" : ""}`} aria-hidden="true" />
           </div>
-          <div className="terminal-block">
-            <code>inspect node</code>
-            <code>verify channel_ready</code>
-            <code>measure send capacity</code>
-            <code>build payment proof</code>
+          <div className="signal-stack">
+            <div><span>01</span><p>Node reachable and synchronized</p><i /></div>
+            <div><span>02</span><p>Usable payment channel found</p><i /></div>
+            <div><span>03</span><p>Outbound capacity verified</p><i /></div>
+            <div><span>04</span><p>Payment proof available</p><i /></div>
           </div>
           <dl className="mini-ledger">
             <div>
-              <dt>Mode</dt>
-              <dd>server-gated</dd>
+              <dt>Data path</dt>
+              <dd>Server mediated</dd>
             </div>
             <div>
-              <dt>RPC</dt>
-              <dd>private</dd>
-            </div>
-            <div>
-              <dt>Execution</dt>
-              <dd>operator locked</dd>
+              <dt>Payment execution</dt>
+              <dd>Operator locked</dd>
             </div>
           </dl>
         </aside>
@@ -126,19 +130,19 @@ function HomePage({ onStart, report }: { onStart: () => void; report?: Flightche
 
       <section className="value-grid">
         <article>
-          <span>01</span>
-          <h2>Preflight before payment</h2>
-          <p>Catch missing peers, pending channels, wrong liquidity direction, and unsupported assets.</p>
+          <span className="value-icon">01</span>
+          <h2>Decide</h2>
+          <p>Get one direct go or no-go answer for the exact amount and asset requested.</p>
         </article>
         <article>
-          <span>02</span>
-          <h2>Proof over screenshots</h2>
-          <p>Generate a bounded Fiber keysend dry-run proof that can be exported for demo or audit.</p>
+          <span className="value-icon">02</span>
+          <h2>Understand</h2>
+          <p>See the blocker, affected resource, and next action without reading raw RPC output.</p>
         </article>
         <article>
-          <span>03</span>
-          <h2>Mainnet-minded defaults</h2>
-          <p>Private RPC, hidden peer target, redacted payment hash, cooldowns, and operator-gated execution.</p>
+          <span className="value-icon">03</span>
+          <h2>Prove</h2>
+          <p>Export a bounded keysend dry-run artifact for integration checks and operational evidence.</p>
         </article>
       </section>
     </div>
@@ -178,8 +182,9 @@ function ConsolePage({
     <div className="page console-page">
       <section className="console-head">
         <div>
-          <span className="eyebrow">Operator console</span>
-          <h1>Run the check. Ship the proof.</h1>
+          <span className="eyebrow">Readiness workspace</span>
+          <h1>Payment preflight</h1>
+          <p>Inspect the active node against a specific payment request.</p>
         </div>
         <div className="console-summary">
           <span>Last check</span>
@@ -201,8 +206,8 @@ function ConsolePage({
           onRun={onRun}
         />
         <aside className={`run-card ${state}`}>
-          <span className="label">Decision</span>
-          <h2>{state === "idle" ? "No check yet" : state}</h2>
+          <span className="label">Current decision</span>
+          <h2>{state === "idle" ? "Not evaluated" : state === "checking" ? "Checking node" : state}</h2>
           <p>{error || report?.readiness.nextAction || "Start with a live Fiber check."}</p>
           <ReportActions report={report} />
         </aside>
@@ -252,11 +257,11 @@ function RunbookPage({ report, amount, asset }: { report?: FlightcheckReport; am
   return (
     <div className="page runbook-page">
       <section className="runbook-hero">
-        <span className="eyebrow">Submission runbook</span>
-        <h1>Security posture, demo flow, and raw audit trail.</h1>
+        <span className="eyebrow">Operations</span>
+        <h1>Controls, failure testing, and audit data.</h1>
         <p>
-          This page keeps supporting material out of the core console while still giving judges and
-          operators the details they need to evaluate the infrastructure.
+          Review deployment safeguards, reproduce failure modes, and inspect the machine-readable
+          output behind a readiness decision.
         </p>
       </section>
 
