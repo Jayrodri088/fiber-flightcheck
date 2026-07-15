@@ -6,7 +6,7 @@ Fiber Flightcheck answers a practical question before a wallet, merchant, servic
 
 > Can this Fiber node satisfy this payment request now, and if not, what must be fixed?
 
-[Open the hosted demo](http://129.151.188.227) · [Read the hackathon submission](./docs/HACKATHON_SUBMISSION.md) · [Follow the demo script](./docs/DEMO_SCRIPT.md)
+[Open the hosted demo](http://129.151.188.227) | [Read the hackathon submission](./docs/HACKATHON_SUBMISSION.md) | [Follow the demo script](./docs/DEMO_SCRIPT.md)
 
 ## Why It Matters
 
@@ -24,7 +24,7 @@ A running FNN node can still be unable to pay. The node may be unsynchronized, d
 - React operator console
 - Human-readable doctor CLI
 - Machine-readable can-pay CLI
-- JSON and Markdown report export
+- Markdown, JSON, and PDF-ready report export
 - Two-node smoke checks
 - Deterministic regression scenarios
 
@@ -148,6 +148,7 @@ This is a functional testnet infrastructure MVP. Mainnet production use still re
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Integration Guide](./docs/INTEGRATION.md)
 - [Operator Guide](./docs/OPERATOR_GUIDE.md)
+- [CKBoost Submission Answers](./docs/CKBOOST_ANSWERS.md)
 - [Product Brief](./docs/PRODUCT_BRIEF.md)
 
 ## License
