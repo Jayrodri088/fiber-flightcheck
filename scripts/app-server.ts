@@ -181,6 +181,16 @@ async function handleHealth() {
   });
 }
 
+function handlePaymentProofPolicy() {
+  return json(200, {
+    enabled: paymentProofEnabled,
+    asset: "CKB",
+    maxCkb: paymentProofMaxCkb,
+    cooldownMs: paymentProofCooldownMs,
+    liveExecutionEnabled: paymentExecutionEnabled,
+  });
+}
+
 async function handlePaymentProof(request: IncomingMessage) {
   const body = await readJsonBody(request);
   const amount = Number(body.amount ?? defaultAmount);
@@ -327,6 +337,8 @@ const server = createServer(async (request, response) => {
     const result =
       route === "POST /api/check"
         ? await handleCheck(request)
+        : route === "GET /api/payment-proof"
+          ? handlePaymentProofPolicy()
         : route === "POST /api/payment-proof"
           ? await handlePaymentProof(request)
         : route === "POST /api/report.md"
