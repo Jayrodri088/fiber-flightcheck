@@ -21,16 +21,16 @@ Use this checklist for the CKBoost entry before the 15 July 2026 23:59 UTC deadl
 
 ## Final Public Demo Check
 
-- [ ] Landing, Console, and Runbook load without layout collisions
-- [ ] /api/health returns ok: true
-- [ ] Network is testnet and node is synchronized
-- [ ] At least one open channel is present
-- [ ] A 10 CKB readiness request succeeds
-- [ ] A 0.01 CKB payment-proof dry-run succeeds
-- [ ] Report and proof downloads work
-- [ ] Raw FNN RPC is not publicly reachable
-- [ ] Live payment execution is disabled
-- [ ] GitHub main and VPS commit hashes match
+- [x] Landing, Console, and Runbook load without layout collisions
+- [x] /api/health returns ok: true
+- [x] Network is testnet and node is synchronized
+- [x] At least one open channel is present
+- [x] A 10 CKB readiness request succeeds
+- [x] A 0.01 CKB payment-proof dry-run succeeds
+- [x] Report and proof downloads work
+- [x] Raw FNN RPC is not publicly reachable
+- [x] Live payment execution is disabled
+- [x] GitHub main and VPS commit hashes match
 
 ## Suggested CKBoost Short Description
 
