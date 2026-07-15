@@ -33,5 +33,11 @@
     "parcel": "^2.15.4",
     "tsx": "^4.20.6",
     "typescript": "^5.8.3"
+  },
+  "license": "MIT",
+  "homepage": "http://129.151.188.227",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jayrodri088/fiber-flightcheck.git"
   }
 }

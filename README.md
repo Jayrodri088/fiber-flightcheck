@@ -1,173 +1,155 @@
 # Fiber Flightcheck
 
-Preflight diagnostics and payment readiness tooling for Fiber Network developers.
+**A live payment-readiness gateway for Fiber Network.**
 
-Fiber Flightcheck answers:
+Fiber Flightcheck answers a practical question before a wallet, merchant, service, or automated workflow attempts payment:
 
-```text
-Can this node/app setup make this Fiber payment right now?
-If not, why not, and what should be fixed?
-```
+> Can this Fiber node satisfy this payment request now, and if not, what must be fixed?
 
-## Features
+[Open the hosted demo](http://129.151.188.227) · [Read the hackathon submission](./docs/HACKATHON_SUBMISSION.md) · [Follow the demo script](./docs/DEMO_SCRIPT.md)
 
-- mock and live Fiber RPC modes
-- node reachability checks
-- peer/channel diagnostics
-- outbound and inbound liquidity summary
-- asset compatibility checks
-- structured failure reasons
-- CLI doctor command
-- `can-pay` readiness command
-- React dashboard
-- live Fiber node mode
-- production-safe server RPC configuration
-- `/api/health` deployment check
-- proof script for core scenarios
-- report export
-- two-node smoke readiness checks
-- bounded payment proof dry-run with redacted output
-- operator-gated live payment execution path
+## Why It Matters
 
-## Configuration
+A running FNN node can still be unable to pay. The node may be unsynchronized, disconnected from peers, missing an open channel, funded with the wrong asset, or short of outbound liquidity. Fiber Flightcheck evaluates those conditions before execution and returns one readiness decision, structured issues, and an actionable next step.
 
-Copy `.env.example` into your deployment environment and set the values through
-your shell, process manager, or VPS service file:
+## What Works
 
-```bash
-PORT=4173
-FIBER_RPC_URL=http://127.0.0.1:8227
-ALLOW_CLIENT_RPC=false
-FLIGHTCHECK_DEFAULT_AMOUNT=10
-FLIGHTCHECK_DEFAULT_ASSET=CKB
-FNN_CLI_PATH=fnn-cli
-PAYMENT_PROOF_ENABLED=false
-PAYMENT_PROOF_TARGET_PUBKEY=
-PAYMENT_PROOF_MAX_CKB=1
-PAYMENT_PROOF_COOLDOWN_MS=60000
-PAYMENT_EXECUTION_ENABLED=false
-PAYMENT_EXECUTION_TOKEN=
-```
+- Live server-side FNN JSON-RPC inspection
+- Node, network, synchronization, and peer health
+- Channel lifecycle and directional liquidity analysis
+- Asset compatibility and CKB funding checks
+- Amount-specific ready or blocked decision
+- Bounded keysend dry-run payment proof
+- Redacted public proof output and operator-gated execution
+- React operator console
+- Human-readable doctor CLI
+- Machine-readable can-pay CLI
+- JSON and Markdown report export
+- Two-node smoke checks
+- Deterministic regression scenarios
 
-`FIBER_RPC_URL` should point to the FNN JSON-RPC endpoint available to the
-app server. Keep `ALLOW_CLIENT_RPC=false` for public deployments so the server
-does not proxy arbitrary RPC URLs.
+## Quick Judge Flow
 
-Set `PAYMENT_PROOF_ENABLED=true` only on a trusted operator deployment with
-`FNN_CLI_PATH` and `PAYMENT_PROOF_TARGET_PUBKEY` configured. The public proof
-flow runs a bounded dry-run keysend against the configured peer and redacts the
-payment hash. Keep `PAYMENT_EXECUTION_ENABLED=false` for public demos unless you
-are inside a short trusted judging window; live execution additionally requires
-`PAYMENT_EXECUTION_TOKEN`.
+1. Open http://129.151.188.227 and select **Console**.
+2. Keep **Live node** selected and request **10 CKB**.
+3. Run Flightcheck and inspect the readiness decision.
+4. Review node state, capacity, funding, and channel lifecycle.
+5. Run a **0.01 CKB** Payment Proof dry-run.
+6. Export the readiness report or payment proof.
+7. Open **Runbook** to inspect safeguards and deterministic failure scenarios.
+
+## Architecture
+
+    Browser / CLI
+        |
+        v
+    Flightcheck app server
+        |
+        +--> private FNN JSON-RPC
+        +--> operator-configured fnn-cli
+        |
+        v
+    normalized FiberSnapshot
+        |
+        v
+    diagnostics + readiness engine
+        |
+        +--> UI decision
+        +--> CLI / JSON
+        +--> Markdown / JSON reports
+        +--> bounded payment proof
+
+The UI, CLI, API, and report exports use the same diagnostic engine.
 
 ## Security Posture
 
-- FNN JSON-RPC should stay private to the app server.
-- Browser users should not be able to submit arbitrary RPC URLs in public mode.
-- Payment proof target peers are operator-configured, not user supplied.
-- Public proof output hides the raw peer target and redacts payment hashes.
-- Live payment execution is disabled by default and token-gated when enabled.
-- Use tiny payment caps and cooldowns for testnet demos; review this before any
-  mainnet deployment.
+- The public browser does not receive the FNN RPC address.
+- Client-selected RPC endpoints are disabled in the hosted deployment.
+- Payment proof targets are operator-configured.
+- Public proof requests are capped and cooldown-limited.
+- Peer identity and full payment hashes are hidden publicly.
+- Live payment execution is disabled by default and token-gated.
+- The hosted demonstration uses Fiber testnet.
 
-## Run
+See [Operator Guide](./docs/OPERATOR_GUIDE.md) for deployment controls.
 
-Live app:
+## Run Locally
 
-```powershell
-npm install
-npm run app
-```
+Requirements:
 
-Then open:
+- Node.js 20 or newer
+- npm
+- An FNN node for live checks, or the included mock scenarios
 
-```text
-http://127.0.0.1:4173
-```
+Install and start the full app:
 
-The app server serves the built UI and runs `/api/check` requests against the
-server-configured Fiber node. The browser does not need direct access to FNN RPC.
+    npm install
+    npm run app
 
-Health check:
+Open http://127.0.0.1:4173.
 
-```powershell
-Invoke-RestMethod http://127.0.0.1:4173/api/health
-```
+The app server serves the production UI and proxies checks only to the configured FNN endpoint.
 
-If `4173` is already in use, the app may already be running. Open the URL above,
-or start a second instance on `4174`:
+## Configuration
 
-```powershell
-npm run app:alt
-```
+Configure through the shell, process manager, or VPS service:
 
-Frontend-only development:
+    PORT=4173
+    FIBER_RPC_URL=http://127.0.0.1:8227
+    ALLOW_CLIENT_RPC=false
+    FLIGHTCHECK_DEFAULT_AMOUNT=10
+    FLIGHTCHECK_DEFAULT_ASSET=CKB
+    FNN_CLI_PATH=fnn-cli
+    PAYMENT_PROOF_ENABLED=false
+    PAYMENT_PROOF_TARGET_PUBKEY=
+    PAYMENT_PROOF_MAX_CKB=1
+    PAYMENT_PROOF_COOLDOWN_MS=60000
+    PAYMENT_EXECUTION_ENABLED=false
+    PAYMENT_EXECUTION_TOKEN=
 
-```powershell
-npm install
-npm start
-```
-
-Frontend-only mode does not provide the `/api/check` proxy, so use `npm run app`
-when testing live FNN integration from the UI.
+Never commit real execution tokens or private keys.
 
 ## CLI
 
-Mock doctor:
+    npm run doctor:mock
+    npm run can-pay:mock -- --amount 10 --asset CKB
+    npm run report:mock
+    npm run smoke:mock
 
-```powershell
-npm run doctor:mock
-```
+Live FNN:
 
-Mock payment readiness:
+    npm run doctor -- --rpc http://127.0.0.1:8227 --amount 10 --asset CKB
+    npm run can-pay -- --rpc http://127.0.0.1:8227 --amount 10 --asset CKB
 
-```powershell
-npm run can-pay:mock -- --amount 10 --asset CKB
-```
+Generated reports are written to reports by default.
 
-Live Fiber node:
+## Verification
 
-```powershell
-npm run doctor -- --rpc http://127.0.0.1:8227 --amount 10 --asset CKB
-npm run can-pay -- --rpc http://127.0.0.1:8227 --amount 10 --asset CKB
-```
+Run the complete local verification suite:
 
-Report export:
+    npm run run:all
 
-```powershell
-npm run report:mock
-npm run report -- --rpc http://127.0.0.1:8227 --amount 10 --asset CKB
-```
+Deployment health:
 
-Generated report files are written to `reports/` by default. Passing a bare
-output name, such as `--out live-flightcheck-report`, produces
-`reports/live-flightcheck-report.json` and `reports/live-flightcheck-report.md`.
+    curl http://127.0.0.1:4173/api/health
 
-Two-node smoke check:
+## Live Versus Simulated
 
-```powershell
-npm run smoke:mock
-npm run smoke -- --payer http://127.0.0.1:8227 --receiver http://127.0.0.1:8229 --amount 1 --asset CKB
-```
+The hosted node inspection, readiness decision, funding check, channel data, and payment-proof dry-run are live against Fiber testnet. Runbook failure scenarios are deterministic simulations used to regression-test failures without damaging the live node.
 
-## Verify
+This is a functional testnet infrastructure MVP. Mainnet production use still requires authentication, durable audit storage, distributed rate limiting, TLS under a controlled domain, monitoring, and external security review.
 
-```powershell
-npm run run:all
-```
+## Documentation
 
-## Why This Exists
-
-Fiber apps often fail in the gap between "node is running" and "payment works":
-RPC may be offline, peers may be missing, channels may be pending, liquidity may
-flow the wrong direction, or the requested asset may not exist in any open
-channel. Flightcheck makes those failures explicit before an app or merchant
-checkout attempts payment.
-
-## Product Docs
-
+- [Hackathon Submission](./docs/HACKATHON_SUBMISSION.md)
+- [Submission Checklist](./docs/SUBMISSION_CHECKLIST.md)
 - [Demo Runbook](./DEMO_RUNBOOK.md)
+- [Three-Minute Demo Script](./docs/DEMO_SCRIPT.md)
 - [Architecture](./docs/ARCHITECTURE.md)
-- [Integration](./docs/INTEGRATION.md)
+- [Integration Guide](./docs/INTEGRATION.md)
 - [Operator Guide](./docs/OPERATOR_GUIDE.md)
 - [Product Brief](./docs/PRODUCT_BRIEF.md)
+
+## License
+
+MIT

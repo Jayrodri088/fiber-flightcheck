@@ -1,38 +1,54 @@
 # Architecture
 
-Fiber Flightcheck is organized as reusable infrastructure rather than a single
-dashboard.
+Fiber Flightcheck is reusable Fiber infrastructure with one diagnostics engine shared by the web application, CLI, API, and report exports.
 
-## Layers
+## Data Flow
 
-```text
-Fiber JSON-RPC or mock data
-  -> FiberSnapshot
-  -> diagnostics
-  -> readiness assessment
-  -> report export / CLI / React UI
-```
+    Browser
+      -> Flightcheck HTTP server
+         -> request validation and RPC policy
+         -> private FNN JSON-RPC
+         -> optional operator-configured fnn-cli proof
+      -> FiberSnapshot
+      -> diagnostics and readiness assessment
+      -> UI / JSON / Markdown / CLI
 
 ## Core Modules
 
-- `lib/fiber-rpc.ts` normalizes live Fiber JSON-RPC responses.
-- `lib/mock-data.ts` provides deterministic demo scenarios.
-- `lib/diagnostics.ts` converts node/channel state into structured issues.
-- `lib/readiness.ts` answers whether a requested payment can be attempted.
-- `lib/report.ts` exports JSON and Markdown reports.
-- `lib/smoke.ts` compares payer and receiver snapshots for two-node readiness.
+- lib/fiber-rpc.ts normalizes live FNN JSON-RPC responses.
+- lib/diagnostics.ts converts low-level node and channel state into structured issues.
+- lib/readiness.ts evaluates amount-specific asset and directional-liquidity readiness.
+- lib/report.ts generates JSON and Markdown artifacts.
+- lib/smoke.ts compares payer and receiver readiness.
+- scripts/app-server.ts serves the UI and security-gated API surface.
+- app contains the product UI without duplicating the diagnostic logic.
 
-## Command Surface
+## HTTP Surface
 
-- `doctor`: human-readable node and readiness diagnosis.
-- `can-pay`: JSON readiness result for app/CI integration.
-- `report`: JSON and Markdown report export.
-- `smoke`: payer/receiver preflight comparison.
+- POST /api/check returns the normalized readiness report.
+- GET /api/health returns deployment and Fiber node health.
+- POST /api/payment-proof performs a bounded operator-configured keysend dry-run.
+- Static routes serve the production React application.
 
-## UI Surface
+## Trust Boundary
 
-The React app is a dashboard over the same report object used by the CLI. It is
-not a separate logic path.
+The browser is untrusted. In public mode it cannot choose an RPC endpoint or payment-proof target. The server owns RPC policy, proof caps, cooldowns, redaction, and the live-execution lock. FNN RPC remains private.
 
-This keeps the product reusable: wallets, merchants, L402 apps, games, and
-agent-payment flows can import the readiness logic without using the dashboard.
+## Decision Model
+
+Readiness combines:
+
+- RPC reachability;
+- synchronization and network metadata;
+- connected peers;
+- channel lifecycle and enabled state;
+- requested asset support;
+- aggregate outbound and inbound capacity;
+- CKB funding state;
+- amount-specific blocking issues.
+
+The result contains a boolean decision, max sendable and receivable capacity, structured issue codes, user/developer messages, and a next action.
+
+## Live and Deterministic Inputs
+
+Live mode reads a real FNN node. Mock snapshots exist only for repeatable CLI and Scenario Lab regression tests. Both paths enter the same diagnostic pipeline.

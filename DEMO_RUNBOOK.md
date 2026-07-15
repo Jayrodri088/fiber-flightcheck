@@ -1,5 +1,7 @@
 # Fiber Flightcheck Demo Runbook
 
+Hosted judging demo: http://129.151.188.227
+
 Use this runbook when preparing the live judging demo.
 
 ## Target Setup

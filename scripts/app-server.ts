@@ -8,6 +8,7 @@ import { promisify } from "node:util";
 import { fetchFiberSnapshot } from "../lib/fiber-rpc";
 import { buildReport } from "../lib/readiness";
 import { reportToMarkdown } from "../lib/report";
+import type { FlightcheckReport } from "../lib/types";
 
 const root = resolve("dist");
 const port = Number(process.env.PORT ?? 4173);
@@ -45,6 +46,44 @@ function ckbToShannons(amount: number) {
 function redactHash(value?: string) {
   if (!value || value.length <= 18) return value ?? "";
   return `${value.slice(0, 10)}...${value.slice(-8)}`;
+}
+
+function publicReport(report: FlightcheckReport): FlightcheckReport {
+  if (allowClientRpc) return report;
+
+  return {
+    ...report,
+    snapshot: {
+      ...report.snapshot,
+      source: "configured Fiber node",
+      node: report.snapshot.node
+        ? { ...report.snapshot.node, nodeId: redactHash(report.snapshot.node.nodeId) }
+        : undefined,
+      peers: report.snapshot.peers.map((_, index) => `peer-${index + 1}`),
+      channels: report.snapshot.channels.map((channel, index) => ({
+        ...channel,
+        channelId: `channel-${index + 1} (${redactHash(channel.channelId)})`,
+        peerId: "configured peer",
+        channelOutpoint: channel.channelOutpoint ? redactHash(channel.channelOutpoint) : undefined,
+      })),
+      funding: report.snapshot.funding
+        ? {
+            ...report.snapshot.funding,
+            address: report.snapshot.funding.address
+              ? redactHash(report.snapshot.funding.address)
+              : undefined,
+            lockScript: undefined,
+          }
+        : undefined,
+    },
+    readiness: {
+      ...report.readiness,
+      issues: report.readiness.issues.map((issue) => ({
+        ...issue,
+        developerMessage: issue.code,
+      })),
+    },
+  };
 }
 
 async function runFnnPayment({
@@ -120,7 +159,7 @@ async function handleCheck(request: IncomingMessage) {
 
   const snapshot = await fetchFiberSnapshot(rpcUrl);
   const report = buildReport(snapshot, { amount, asset });
-  return json(200, report);
+  return json(200, publicReport(report));
 }
 
 async function handleHealth() {
@@ -128,7 +167,7 @@ async function handleHealth() {
   const report = buildReport(snapshot, { amount: defaultAmount, asset: defaultAsset });
   return json(200, {
     ok: snapshot.reachable,
-    configuredRpc: configuredRpcUrl,
+    configuredRpc: allowClientRpc ? configuredRpcUrl : "configured Fiber node",
     clientRpcAllowed: allowClientRpc,
     network: snapshot.node?.network ?? "unknown",
     chainHash: snapshot.node?.chainHash,
@@ -185,7 +224,7 @@ async function handlePaymentProof(request: IncomingMessage) {
   if (!report.readiness.ready) {
     return json(409, {
       proofReady: false,
-      readiness: report.readiness,
+      readiness: publicReport(report).readiness,
       nextAction: report.readiness.nextAction,
     });
   }

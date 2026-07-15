@@ -1706,3 +1706,23 @@ input {
     gap: 16px;
   }
 }
+
+/* Top-level page rhythm: direct sections must never share a border edge. */
+.console-page > .panel,
+.runbook-page > .panel {
+  margin-top: 20px;
+}
+
+.console-page > .panel + .panel,
+.runbook-page > .panel + .panel {
+  margin-top: 20px;
+}
+
+@media (max-width: 680px) {
+  .console-page > .panel,
+  .runbook-page > .panel,
+  .console-page > .panel + .panel,
+  .runbook-page > .panel + .panel {
+    margin-top: 16px;
+  }
+}

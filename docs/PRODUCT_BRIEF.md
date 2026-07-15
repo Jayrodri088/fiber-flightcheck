@@ -1,35 +1,38 @@
 # Product Brief
 
-Fiber Flightcheck is a preflight and diagnostics toolkit for Fiber Network
-developers and operators.
+Fiber Flightcheck is a pre-payment readiness gateway for Fiber Network developers and operators.
 
-It checks whether a node, channel setup, liquidity direction, and asset
-configuration are ready for a payment before a wallet, merchant checkout, game,
-L402 service, or agent workflow attempts to pay.
+It turns fragmented live FNN state into a direct answer: can this node satisfy this amount and asset now, and what should be fixed if it cannot?
 
-## Users
+## Primary Users
 
-- wallet developers
-- merchant checkout developers
-- L402 and paywall builders
-- game and agent-payment builders
-- Fiber node operators
-- QA and infrastructure teams
+- wallet and checkout developers;
+- Fiber node operators;
+- merchant and payment infrastructure teams;
+- CI and QA systems;
+- games, paywalls, and agent-payment services.
 
 ## Product Surfaces
 
-- CLI doctor command
-- JSON can-pay command
-- JSON/Markdown report export
-- two-node smoke readiness check
-- React dashboard
-- reusable diagnostics/readiness modules
+- hosted React operator console;
+- live readiness and health APIs;
+- bounded payment-proof dry-run;
+- doctor and can-pay CLI commands;
+- JSON and Markdown reports;
+- two-node smoke checks;
+- deterministic failure regression scenarios;
+- reusable diagnostics and readiness modules.
+
+## Differentiation
+
+Flightcheck is not only a node dashboard. It combines operational state into an amount-specific pre-payment decision and can produce a bounded proof artifact using the same private node connection.
 
 ## Roadmap
 
-- invoice lifecycle checks
-- payment attempt tracing
-- route confidence scoring
-- CI integration mode
-- more asset-specific liquidity analysis
-- published SDK package
+- versioned TypeScript SDK;
+- invoice lifecycle and payment tracing;
+- route confidence and retry guidance;
+- authenticated webhooks and CI gates;
+- UDT and stable-value asset policies;
+- multi-node monitoring and alerting;
+- production auth, persistence, TLS, and security review.
