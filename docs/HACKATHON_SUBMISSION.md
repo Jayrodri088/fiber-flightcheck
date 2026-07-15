@@ -22,7 +22,7 @@ Flightcheck fits this category as operational infrastructure for monitoring Fibe
 
 - **Hosted demo:** http://129.151.188.227
 - **Open-source repository:** https://github.com/Jayrodri088/fiber-flightcheck
-- **Video demonstration:** Add the final uploaded video URL to the CKBoost submission form.
+- **Video demonstration:** Published with the CKBoost submission entry.
 
 ## The Infrastructure Gap
 
@@ -56,7 +56,7 @@ Developers often discover those conditions only after an attempted payment or by
 - React operator console.
 - Human-readable doctor CLI.
 - Machine-readable can-pay CLI.
-- JSON and Markdown report export.
+- Markdown, JSON, and PDF-ready report export.
 - Two-node smoke-readiness command.
 - Deterministic failure scenarios for regression testing.
 - Shared diagnostics and readiness modules across CLI, API, and UI.
@@ -103,7 +103,7 @@ Developers often discover those conditions only after an attempted payment or by
         |
         +--> React UI
         +--> CLI/JSON
-        +--> Markdown/JSON reports
+        +--> Markdown/JSON/PDF-ready reports
         +--> bounded payment proof
 
 The browser never needs direct access to FNN. In the public deployment, client-supplied RPC endpoints are disabled and all live checks use the server-configured private RPC.
@@ -148,4 +148,4 @@ This is a functional testnet infrastructure MVP and live hosted demonstration. B
 
 ## AI Tooling Disclosure
 
-AI tooling was used as a development aide for research, implementation review, documentation, and UI iteration. The project was repeatedly tested against live Fiber infrastructure and refined through human-directed review. An AI tooling allowance claim may be submitted separately with any required proof of purchase.
+AI tooling was used as a development aide for research, implementation review, documentation, and UI iteration. The project was repeatedly tested against live Fiber infrastructure and refined through human-directed review. All technical claims and live outputs were verified against the deployed Fiber testnet environment.

@@ -3,3 +3,8 @@ dist/
 .parcel-cache/
 reports/
 logs/
+submission/
+.env
+.env.*
+!.env.example
+*.log

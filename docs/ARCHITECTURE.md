@@ -11,14 +11,14 @@ Fiber Flightcheck is reusable Fiber infrastructure with one diagnostics engine s
          -> optional operator-configured fnn-cli proof
       -> FiberSnapshot
       -> diagnostics and readiness assessment
-      -> UI / JSON / Markdown / CLI
+      -> UI / JSON / Markdown / PDF / CLI
 
 ## Core Modules
 
 - lib/fiber-rpc.ts normalizes live FNN JSON-RPC responses.
 - lib/diagnostics.ts converts low-level node and channel state into structured issues.
 - lib/readiness.ts evaluates amount-specific asset and directional-liquidity readiness.
-- lib/report.ts generates JSON and Markdown artifacts.
+- lib/report.ts generates JSON and Markdown artifacts; the UI renders a redacted PDF-ready report.
 - lib/smoke.ts compares payer and receiver readiness.
 - scripts/app-server.ts serves the UI and security-gated API surface.
 - app contains the product UI without duplicating the diagnostic logic.

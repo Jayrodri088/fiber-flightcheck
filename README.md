@@ -6,7 +6,7 @@ Fiber Flightcheck answers a practical question before a wallet, merchant, servic
 
 > Can this Fiber node satisfy this payment request now, and if not, what must be fixed?
 
-[Open the hosted demo](http://129.151.188.227) | [Read the hackathon submission](./docs/HACKATHON_SUBMISSION.md) | [Follow the demo script](./docs/DEMO_SCRIPT.md)
+[Open the hosted demo](http://129.151.188.227) | [Read the technical submission](./docs/HACKATHON_SUBMISSION.md) | [Review the architecture](./docs/ARCHITECTURE.md)
 
 ## Why It Matters
 
@@ -102,7 +102,7 @@ Configure through the shell, process manager, or VPS service:
     FNN_CLI_PATH=fnn-cli
     PAYMENT_PROOF_ENABLED=false
     PAYMENT_PROOF_TARGET_PUBKEY=
-    PAYMENT_PROOF_MAX_CKB=1
+    PAYMENT_PROOF_MAX_CKB=0.05
     PAYMENT_PROOF_COOLDOWN_MS=60000
     PAYMENT_EXECUTION_ENABLED=false
     PAYMENT_EXECUTION_TOKEN=
@@ -141,15 +141,10 @@ This is a functional testnet infrastructure MVP. Mainnet production use still re
 
 ## Documentation
 
-- [Hackathon Submission](./docs/HACKATHON_SUBMISSION.md)
-- [Submission Checklist](./docs/SUBMISSION_CHECKLIST.md)
-- [Demo Runbook](./DEMO_RUNBOOK.md)
-- [Three-Minute Demo Script](./docs/DEMO_SCRIPT.md)
+- [Technical Submission](./docs/HACKATHON_SUBMISSION.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Integration Guide](./docs/INTEGRATION.md)
 - [Operator Guide](./docs/OPERATOR_GUIDE.md)
-- [CKBoost Submission Answers](./docs/CKBOOST_ANSWERS.md)
-- [Product Brief](./docs/PRODUCT_BRIEF.md)
 
 ## License
 
